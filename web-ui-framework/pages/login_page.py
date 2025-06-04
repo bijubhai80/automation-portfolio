@@ -1,10 +1,9 @@
-import sys
-import os
 from selenium.webdriver.common.by import By
+from pages.base_page import BasePage
 
-class LoginPage:
+class LoginPage(BasePage):
     def __init__(self, driver):
-        self.driver = driver
+        super().__init__(driver)
         self.username_input = (By.ID, "user-name")
         self.password_input = (By.ID, "password")
         self.login_button = (By.ID, "login-button")
@@ -24,7 +23,7 @@ class LoginPage:
         login_button.click()
     
     def login(self, username, password):
-        self.enter_username(username)
-        self.enter_password(password)
-        self.click_login()
-        
+        self.type(self.username_input, username)
+        self.type(self.password_input, password)
+        self.click(self.login_button)
+   
