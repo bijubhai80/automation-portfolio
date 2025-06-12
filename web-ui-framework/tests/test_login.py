@@ -5,10 +5,7 @@ import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service as Service
-from webdriver_manager.chrome import ChromeDriverManager
 from pages.login_page import LoginPage
 from pages.home_page import HomePage
 
@@ -19,14 +16,13 @@ from pages.home_page import HomePage
     ("problem_user", "secret_sauce"),
     ("invalid_user", "invalid_password")])
 
-def test_login_validate_user(username, password):
+@pytest.mark.smoke
+def test_login_validate_user(browser, username, password):
     #Initialize the Chrome driver
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service)
-
-    driver.maximize_window()
+    driver = browser
     driver.get("https://www.saucedemo.com/")
-
+    driver.maximize_window()
+    
     #Create an instance of the login page
     login_page = LoginPage(driver)
 
@@ -43,6 +39,26 @@ def test_login_validate_user(username, password):
     else:
         error_element = driver.find_element(By.XPATH, "//h3[@data-test='error']")
         assert error_element.is_displayed()
+
+    #Close the browser
+    driver.quit()
+
+@pytest.mark.regression
+def test_login_invalid_user(browser):
+    #Initialize the Chrome driver
+    driver = browser
+    driver.get("https://www.saucedemo.com/")
+    driver.maximize_window()
+    
+    #Create an instance of the login page
+    login_page = LoginPage(driver)
+
+    #Perform Login with invalid user
+    login_page.login("invalid_user", "invalid_password")
+
+    #Verify error message is displayed
+    error_element = driver.find_element(By.XPATH, "//h3[@data-test='error']")
+    assert error_element.is_displayed()
 
     #Close the browser
     driver.quit()
